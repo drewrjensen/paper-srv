@@ -30,12 +30,5 @@ RUN wget "https://hangarcdn.papermc.io/plugins/jmp/MiniMOTD/versions/2.1.5/PAPER
 RUN wget "https://github.com/plan-player-analytics/Plan/releases/download/5.6.2965/Plan-5.6-build-2965.jar" -O Plan.jar
 RUN wget "https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.2.1/PAPER/ViaVersion-5.2.1.jar" -O ViaVersion.jar
 
-# Start server to generate plugin folders
-# WORKDIR /srv/papermc
-# RUN java -jar /srv/papermc/paper.jar nogui
-
-# Edit plugin config files
-# WORKDIR /srv/papermc/plugins
-
 WORKDIR /srv/papermc
 ENTRYPOINT ["bash", "./start.sh"]
