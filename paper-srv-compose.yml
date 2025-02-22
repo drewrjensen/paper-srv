@@ -1,6 +1,6 @@
 services:
   paper-srv:
-    image: drewrjensen/paper-srv:{{ TAG }}
+    image: ghcr.io/drewrjensen/paper-srv:{{ TAG }}
     ports:
       - 8080:8080
       - 25565:25565
