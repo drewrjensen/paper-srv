@@ -1,13 +1,13 @@
 FROM alpine:latest
 
 RUN mkdir -p /srv/papermc
-VOLUME [ "/srv/papermc/data" ]
 VOLUME [ "/srv/papermc/worlds" ]
 WORKDIR /srv/papermc
 
 RUN apk add --no-cache alpine-conf
 RUN apk add --no-cache bash
 RUN apk add --no-cache openjdk21
+RUN apk add --no-cache screen
 RUN apk add --no-cache wget
 
 RUN wget https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/175/downloads/paper-1.21.4-175.jar
