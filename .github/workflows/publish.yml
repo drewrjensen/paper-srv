@@ -64,7 +64,7 @@ jobs:
       - name: Replace {{ TAG }} in paper-srv-compose.yml
         id: replace_tag
         run: |
-          sed -i "s/{{ TAG }}/${{ steps.meta.outputs.tags }}/g" paper-srv-compose.yml
+          sed -i "s|{{ TAG }}|${{ steps.meta.outputs.tags }}|g" paper-srv-compose.yml
 
       - name: Create GitHub Release
         id: create_release
