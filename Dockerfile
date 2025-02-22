@@ -2,6 +2,7 @@ FROM alpine:latest
 
 RUN mkdir -p /srv/papermc
 VOLUME [ "/srv/papermc/data" ]
+VOLUME [ "/srv/papermc/worlds" ]
 WORKDIR /srv/papermc
 
 RUN apk add --no-cache alpine-conf
