@@ -1,22 +1,18 @@
 name: Create and publish a Docker image
 
-# Configures this workflow to run every time a change is pushed to the branch called `main`.
 on:
   push:
-    branches: ['main', 'dev']
+    branches: ['main']
 
-# Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
-# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
-    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
-      contents: read
+      contents: write
       packages: write
       attestations: write
       id-token: write
@@ -25,7 +21,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Log in to the Container registry using the GitHub token.
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
@@ -33,7 +28,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker, including the commit's short SHA.
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
@@ -42,7 +36,6 @@ jobs:
           tags: |
             type=raw,value=${{ github.sha }},prefix=sha-,enable=${{ github.event_name == 'push' }}
 
-      # Build and push the Docker image with the extracted tags and labels.
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
@@ -52,32 +45,38 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      # Replace the {{ TAG }} placeholder in paper-srv-compose.yml with the commit's short SHA.
       - name: Replace {{ TAG }} in paper-srv-compose.yml
         id: replace_tag
         run: |
           SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
           sed -i "s|{{ TAG }}|$SHORT_SHA|g" paper-srv-compose.yml
 
-      # Create a GitHub release using the current branch name as the tag.
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Create GitHub Release
         id: create_release
         run: |
-          RELEASE_TAG=${GITHUB_REF##*/}
+          RELEASE_TAG=$(echo ${{ github.sha }} | cut -c1-7)
           echo "Creating release for tag $RELEASE_TAG"
           RESPONSE=$(curl -s -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -d '{"tag_name": "'"${RELEASE_TAG}"'", "name": "'"${RELEASE_TAG}"'", "body": "Release for commit $GITHUB_SHA"}' \
             https://api.github.com/repos/${{ github.repository }}/releases)
+          if echo "$RESPONSE" | grep -q "Validation Failed"; then
+            echo "Error: Failed to create release"
+            echo "$RESPONSE"
+            exit 1
+          fi
           echo "Release created: $RESPONSE"
+          RELEASE_ID=$(echo $RESPONSE | jq -r .id)
+          echo "::set-output name=release_id::$RELEASE_ID"
 
-      # Upload the updated paper-srv-compose.yml as a release asset.
       - name: Upload paper-srv-compose.yml as release asset
         id: upload_compose
         run: |
-          RELEASE_ID=$(echo $RESPONSE | jq -r .id)
           curl -L -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @paper-srv-compose.yml \
-            "https://uploads.github.com/repos/${{ github.repository }}/releases/$RELEASE_ID/assets?name=paper-srv-compose.yml"
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=paper-srv-compose.yml"
