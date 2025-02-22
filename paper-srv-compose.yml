@@ -1,0 +1,14 @@
+services:
+  paper-srv:
+    image: drewrjensen/paper-srv:<tag>
+    ports:
+      - 8080:8080
+      - 25565:25565
+
+volumes:
+  paper-srv-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/drewrjensen/paper-srv
+      o: bind
