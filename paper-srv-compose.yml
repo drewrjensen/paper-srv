@@ -1,10 +1,5 @@
 services:
   paper-srv:
-    environment:
-      PERSISTANT_STORAGE: /srv/papermc
-      TAG: {{ TAG }}
-      VERSION: 1.21.4
-      BUILD: 175
     args:
       - VERSION: ${VERSION}
       - BUILD: ${BUILD}
@@ -33,7 +28,6 @@ services:
     security_opt:
       - no-new-privileges:true
     stdin_open: true
-    stdout: true
     stop_grace_period: 30s
     stop_signal: SIGTERM
     tty: true
