@@ -80,8 +80,16 @@ jobs:
       - name: Upload paper-srv-compose.yml as release asset
         id: upload_compose
         run: |
+          # Upload paper-srv-compose.yml
           curl -L -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/octet-stream" \
             --data-binary @paper-srv-compose.yml \
             "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=paper-srv-compose.yml"
+      
+          # Upload .env
+          curl -L -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @.env \
+            "https://uploads.github.com/repos/${{ github.repository }}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=.env"
