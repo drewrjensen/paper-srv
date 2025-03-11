@@ -37,7 +37,6 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    user: 1000:1000
     working_dir: /srv/papermc
     volumes:
       - paper-plugins-vol:/srv/papermc/plugins
@@ -45,14 +44,4 @@ services:
 
 volumes:
   paper-plugins-vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ${PERSISTANT_STORAGE}/plugins
-      o: bind
   paper-worlds-vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ${PERSISTANT_STORAGE}/worlds
-      o: bind
