@@ -1,8 +1,10 @@
 services:
   paper-srv:
-    args:
-      - VERSION: ${VERSION}
-      - BUILD: ${BUILD}
+    build:
+      context: .
+      args:
+        - VERSION: ${VERSION}
+        - BUILD: ${BUILD}
     container_name: paper-srv
     cap_drop:
       - ALL
