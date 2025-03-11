@@ -3,8 +3,8 @@ services:
     build:
       context: .
       args:
-        - VERSION: ${VERSION}
-        - BUILD: ${BUILD}
+        VERSION: ${VERSION}
+        BUILD: ${BUILD}
     container_name: paper-srv
     cap_drop:
       - ALL
