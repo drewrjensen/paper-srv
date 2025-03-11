@@ -1,37 +1,37 @@
 FROM alpine:latest
 
-RUN mkdir -p /srv/papermc
-VOLUME [ "/srv/papermc/worlds" ]
-WORKDIR /srv/papermc
+# Args
+ARG PAPERMC_VERSION=1.21.4
+ARG PAPERMC_BUILD=175
 
+# Image config
+EXPOSE 8080
+EXPOSE 25565
+VOLUME [ "/srv/papermc/worlds" ]
+
+# Install dependencies
 RUN apk add --no-cache alpine-conf
 RUN apk add --no-cache bash
 RUN apk add --no-cache openjdk21
 RUN apk add --no-cache screen
 RUN apk add --no-cache wget
 
-RUN wget https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/175/downloads/paper-1.21.4-175.jar
-RUN mv paper-1.21.4-175.jar paper.jar
-RUN echo "eula=true" > eula.txt
-
-EXPOSE 8080
-EXPOSE 25565
-
-COPY config .
-COPY ops.json .
-COPY plugins .
-COPY server.properties .
-COPY --chmod=0755 start.sh .
-COPY whitelist.json .
-
-# Download plugins
-RUN mkdir -p /srv/papermc/plugins
-WORKDIR /srv/papermc/plugins
-RUN wget "https://hangarcdn.papermc.io/plugins/jmp/MiniMOTD/versions/2.1.5/PAPER/minimotd-bukkit-2.1.5.jar" -O MiniMOTD.jar
-RUN wget "https://github.com/plan-player-analytics/Plan/releases/download/5.6.2965/Plan-5.6-build-2965.jar" -O Plan.jar
-RUN wget "https://mediafilez.forgecdn.net/files/6204/234/tectonic-fabric-1.20.1-2.4.4.jar" -O Tectonic.jar
-RUN wget "https://mediafilez.forgecdn.net/files/6090/387/Terralith_1.21.x_v2.5.8.jar" -O Terralith.jar
-RUN wget "https://hangarcdn.papermc.io/plugins/ViaVersion/ViaVersion/versions/5.2.1/PAPER/ViaVersion-5.2.1.jar" -O ViaVersion.jar
-
+# Install PaperMC
+RUN mkdir -p /srv/papermc
 WORKDIR /srv/papermc
+RUN wget https://api.papermc.io/v2/projects/paper/versions/${PAPERMC_VERSION}/builds/${PAPERMC_BUILD}/downloads/paper-${PAPERMC_VERSION}-${PAPERMC_BUILD}.jar
+RUN mv paper-${PAPERMC_VERSION}-${PAPERMC_BUILD}.jar paper.jar
+
+# Copy server configs
+# Edit or overwrite the server config files as needed
+RUN mkdir -p /srv/papermc/config
+COPY conf .
+
+# Plugins
+# Place your plugins in the plugins folder
+RUN mkdir -p /srv/papermc/plugins
+COPY plugins ./plugins/
+
+# Start script
+COPY --chmod=0755 start.sh .
 ENTRYPOINT ["bash", "./start.sh"]

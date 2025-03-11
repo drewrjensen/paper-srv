@@ -1,14 +1,62 @@
 services:
   paper-srv:
-    image: ghcr.io/drewrjensen/paper-srv:{{ TAG }}
+    environment:
+      PERSISTANT_STORAGE: /srv/papermc
+      TAG: {{ TAG }}
+      VERSION: 1.21.4
+      BUILD: 175
+    args:
+      - VERSION: ${VERSION}
+      - BUILD: ${BUILD}
+    container_name: paper-srv
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_RESOURCE
+    devices:
+      - /dev/fuse
+    hostname: paper-srv
+    image: ghcr.io/drewrjensen/paper-srv:${TAG}
+    labels:
+      - "com.docker.compose.project=paper-srv"
+      - "com.docker.compose.service=paper-srv"
+      - "com.docker.compose.version=${VERSION}"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - 8080:8080
       - 25565:25565
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    stdin_open: true
+    stdout: true
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
+    tty: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    user: 1000:1000
+    working_dir: /srv/papermc
+    volumes:
+      - paper-plugins-vol:/srv/papermc/plugins
+      - paper-worlds-vol:/srv/papermc/worlds
 
 volumes:
-  paper-srv-data:
+  paper-plugins-vol:
     driver: local
     driver_opts:
       type: none
-      device: /home/drewrjensen/paper-srv
+      device: ${PERSISTANT_STORAGE}/plugins
+      o: bind
+  paper-worlds-vol:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PERSISTANT_STORAGE}/worlds
       o: bind
