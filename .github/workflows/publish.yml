@@ -52,9 +52,11 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Replace {{TAG}} in paper-srv-compose.yml
+      - name: Replace {{TAG}} in .env / paper-srv-compose.yml
         id: replace_tag
-        run: sed -i "s|{{TAG}}|${{ steps.short_sha.outputs.SHA_SHORT }}|g" paper-srv-compose.yml
+        run: |
+          sed -i "s|{{TAG}}|${{ steps.short_sha.outputs.SHA_SHORT }}|g" .env
+          sed -i "s|{{TAG}}|${{ steps.short_sha.outputs.SHA_SHORT }}|g" paper-srv-compose.yml
 
       - name: Install jq
         run: sudo apt-get install -y jq
