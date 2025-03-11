@@ -63,10 +63,10 @@ jobs:
         id: create_release
         run: |
           RELEASE_TAG=${{ steps.short_sha.outputs.SHA_SHORT }}
-          echo "Creating release for tag $RELEASE_TAG"
+          echo "Creating release for tag ${RELEASE_TAG}"
           RESPONSE=$(curl -s -X POST \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -d '{"tag_name": "'"${RELEASE_TAG}"'", "name": "'"${RELEASE_TAG}"'", "body": "Release for commit $GITHUB_SHA"}' \
+            -d '{"tag_name": "'"${RELEASE_TAG}"'", "name": "'"${RELEASE_TAG}"'", "body": "Release for commit ${GITHUB_SHA}"}' \
             https://api.github.com/repos/${{ github.repository }}/releases)
           if echo "$RESPONSE" | grep -q "Validation Failed"; then
             echo "Error: Failed to create release"
