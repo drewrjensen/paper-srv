@@ -25,12 +25,12 @@ RUN mv paper-${PAPERMC_VERSION}-${PAPERMC_BUILD}.jar paper.jar
 # Copy server configs
 # Edit or overwrite the server config files as needed
 RUN mkdir -p /srv/papermc/config
-COPY conf .
+COPY conf/ .
 
 # Plugins
 # Place your plugins in the plugins folder
 RUN mkdir -p /srv/papermc/plugins
-COPY plugins ./plugins/
+COPY plugins/ plugins/
 
 # Start script
 COPY --chmod=0755 start.sh .
